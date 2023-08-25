@@ -1,22 +1,50 @@
 let altura,
     largura = 0
-var vidas = 1
+let vidas = 3
 
 function ajustaTamanhoPalcoJogo() {
     altura = innerHeight
     largura = innerWidth
 }
 
+function atualizaCronometro(tempoRestante) {
+    const cronometro = document.querySelector('.cronometro')
+    cronometro.textContent = `TEMPO RESTANTE: ${tempoRestante}`
+}
+
+function iniciarJogo() {
+    let tempoRestante = 15
+    atualizaCronometro(tempoRestante)
+
+    const cronometroInterval = setInterval(function() {
+        tempoRestante--
+        atualizaCronometro(tempoRestante)
+
+        if (tempoRestante === 0) {
+            clearInterval(cronometroInterval)
+
+            if (vidas > 0) {
+                window.location.href = 'win.html'
+            } else {
+                window.location.href = 'over.html'
+            }
+        }
+    }, 1000)
+
+    setInterval(function() {
+        posicaoRandomica()
+    }, 2000)
+}
+
+window.onload = function() {
+    ajustaTamanhoPalcoJogo()
+    iniciarJogo()
+}
+
 function posicaoRandomica() {
     if (document.getElementById('mosquito')) {
         document.getElementById('mosquito').remove()
-    }
-
-    if (vidas > 3) {
-        window.location.href = 'over.html'
-    } else {
-        document.getElementById('v' + vidas).src = 'src/coracao_vazio.png'
-        vidas++
+        atualizaVidas()
     }
 
     let posiçãoX = Math.floor(Math.random() * (largura - 100))
@@ -26,19 +54,26 @@ function posicaoRandomica() {
     posiçãoY = posiçãoY < 0 ? 0 : posiçãoY
 
     let mosquito = document.createElement('img')
-    mosquito.src = 'src/mosca.png'
-    mosquito.className = 'mosquito1 ' + ladoAleatorio()
-    mosquito.style.position = 'absolute'
-    mosquito.style.left = posiçãoX + 'px'
-    mosquito.style.top = posiçãoY + 'px'
-    mosquito.id = 'mosquito'
-    mosquito.onclick = function () {this.remove()}
-    document.body.appendChild(mosquito)
-}
+        mosquito.src = 'src/mosca.png'
+        mosquito.className = 'mosquito1 ' + ladoAleatorio()
+        mosquito.style.position = 'absolute'
+        mosquito.style.left = posiçãoX + 'px'
+        mosquito.style.top = posiçãoY + 'px'
+        mosquito.id = 'mosquito'
+        mosquito.onclick = function() {
+            this.remove()
+        };
+        document.body.appendChild(mosquito)
+    }
 
-setInterval(function(){
-    posicaoRandomica()
-}, 2000)
+function atualizaVidas() {
+    if (vidas <= 0) {
+        window.location.href = 'over.html'
+    } else {
+        document.getElementById('v' + vidas).src = 'src/coracao_vazio.png'
+        vidas--
+    }
+}
 
 function ladoAleatorio() {
     let classe = Math.floor(Math.random()*2)
@@ -49,7 +84,7 @@ function ladoAleatorio() {
         case 1:
             return 'ladoB'
         default:
-            break;
+            break
     }
 }
 
